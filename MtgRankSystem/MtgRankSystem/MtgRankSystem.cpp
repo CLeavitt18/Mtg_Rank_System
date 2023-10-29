@@ -5,7 +5,27 @@
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    bool running = true;
+    std::string deckName;
+
+    while (running)
+    {
+        std::cout << "What is the name of your deck?\n";
+
+        std::cin >> deckName;
+
+        std::cout << "Do you wish to tell me another deck's name?\n Y) Yes \n N) No\n";
+
+        char answer;
+        std::cin >> answer;
+
+        if (toupper(answer) == 'N')
+        {
+            running = false;
+        }
+    }
+
+    std::cout << "\n\nRanking System Shutting Down......\n";
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

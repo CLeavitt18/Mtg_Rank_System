@@ -5,7 +5,11 @@
 
 char ValidateAnswer(std::string message);
 int AddPoints();
-char GetRank();
+std::string GetRank(int points);
+
+static int ranges[6][2] = { { 0,1 }, { 2,3 }, {4, 7}, { 8, 11}, {12, 15}, {16, 19} };
+static std::string ranks[6] = { "D", "C", "B", "A", "S", "S+"};
+
 
 static char yes = 'Y';
 static char no = 'N';
@@ -20,6 +24,7 @@ int main()
     bool running = true;
     std::string deckName;
     int points;
+    std::string rank;
 
     while (running)
     {
@@ -41,8 +46,9 @@ int main()
         criteria[11] = ValidateAnswer("\nIs there a companion or partener of this deck?");
 
         points = AddPoints();
+        rank = GetRank(points);
 
-        std::cout << "\n\nPoint Total: " << points;
+        std::cout << "\n\nPoint Total: " << points << "\nRank: " << rank << '\n';
 
         char answer = ValidateAnswer("\nDo you wish to rank another deck?");
 
@@ -53,6 +59,7 @@ int main()
     }
 
     std::cout << "\n\nRanking System Shutting Down......\n";
+    return 0;
 }
 
 char ValidateAnswer(std::string message)
@@ -93,7 +100,15 @@ int AddPoints()
     return returnValue;
 }
 
-char GetRank()
+std::string GetRank(int points)
 {
-    return '\0';
+    for (size_t i = 0; i < 6; i++)
+    {
+        if (points >= ranges[i][0] && points <= ranges[i][1])
+        {
+            return ranks[i];
+        }
+    }
+
+    return "\0";
 }

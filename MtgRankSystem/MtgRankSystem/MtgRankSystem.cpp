@@ -4,9 +4,14 @@
 #include <iostream>
 
 char ValidateAnswer(std::string message);
+int AddPoints();
+char GetRank();
 
 static char yes = 'Y';
 static char no = 'N';
+    
+static char criteria[12];
+static int points[12] = { 2,2,2,2,2,1,1,2,1,2,1,1 };
 
 static std::string questionAnswerString = "\n Y) Yes \n N) No\n";
 
@@ -14,48 +19,32 @@ int main()
 {
     bool running = true;
     std::string deckName;
-    char comDraw;
-    char combo;
-    char tutor;
-    char graveYard;
-    char landDes;
-    char comManaCheat;
-    char fastMana;
-    char Free;
-    char stax;
-    char winCon;
-    char phases;
-    char companion;
     int points;
 
     while (running)
     {
-        points = 0;
+        system("CLS");
         std::cout << "What is the name of your deck?\n";
         std::cin >> deckName;
 
-        comDraw = ValidateAnswer("\nDoes your commamder have card draw on it?");
+        criteria[0] = ValidateAnswer("\nDoes your commamder have card draw on it?");
+        criteria[1] = ValidateAnswer("\nDo you have a 2 to 3 card infinte combo in the deck?");
+        criteria[2] = ValidateAnswer("\nDoes this deck have any tutors in it?");
+        criteria[3] = ValidateAnswer("\nDo you have a way of getting things out of the grave yard repeatedly?");
+        criteria[4] = ValidateAnswer("\nCan you destroy lands on mass?");
+        criteria[5] = ValidateAnswer("\nDoes your commander have a way of cheating on mana?");
+        criteria[6] = ValidateAnswer("\nDo you have fast mana");
+        criteria[7] = ValidateAnswer("\nDo you have free interaction");
+        criteria[8] = ValidateAnswer("\nDo you have any stax pieces in this deck?");
+        criteria[9] = ValidateAnswer("\nIs there an alternate win con in the deck?");
+        criteria[10] = ValidateAnswer("\nDo you have any way of getting extra phases in this deck?");
+        criteria[11] = ValidateAnswer("\nIs there a companion or partener of this deck?");
 
-        if (comDraw = yes)
-        {
-            points += 2;
-        }
+        points = AddPoints();
 
-        combo = ValidateAnswer("\nDo you have a 2 to 3 card infinte combo in the deck?");
+        std::cout << "\n\nPoint Total: " << points;
 
-        if (combo = yes)
-        {
-            points += 2;
-        }
-
-        tutor = ValidateAnswer("\nDoes this deck have any tutors in it?");
-
-        if (tutor = yes)
-        {
-            points += 2;
-        }
-
-        char answer = ValidateAnswer("\nDo you wish to tell me another deck's name?");
+        char answer = ValidateAnswer("\nDo you wish to rank another deck?");
 
         if (answer == no)
         {
@@ -87,4 +76,24 @@ char ValidateAnswer(std::string message)
     } while (checkAgain);
 
     return answer;
+}
+
+int AddPoints()
+{
+    int returnValue = 0;
+
+    for (size_t i = 0; i < 12; i++)
+    {
+        if (criteria[i] == yes)
+        {
+            returnValue += points[i];
+        }
+    }
+
+    return returnValue;
+}
+
+char GetRank()
+{
+    return '\0';
 }

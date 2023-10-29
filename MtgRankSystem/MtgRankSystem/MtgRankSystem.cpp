@@ -2,14 +2,16 @@
 //
 
 #include <iostream>
+#include <fstream>
+#include <string>
 
 char ValidateAnswer(std::string message);
 int AddPoints();
 std::string GetRank(int points);
+void Save(std::string deckName, int points, std::string rank);
 
 static int ranges[6][2] = { { 0,1 }, { 2,3 }, {4, 7}, { 8, 11}, {12, 15}, {16, 19} };
 static std::string ranks[6] = { "D", "C", "B", "A", "S", "S+"};
-
 
 static char yes = 'Y';
 static char no = 'N';
@@ -49,6 +51,11 @@ int main()
         rank = GetRank(points);
 
         std::cout << "\n\nPoint Total: " << points << "\nRank: " << rank << '\n';
+
+        if (ValidateAnswer("\nWould you like to save this deck?\n") == yes)
+        {
+            Save(deckName, points, rank);
+        }
 
         char answer = ValidateAnswer("\nDo you wish to rank another deck?");
 
@@ -111,4 +118,22 @@ std::string GetRank(int points)
     }
 
     return "\0";
+}
+
+void Save(std::string deckName, int points, std::string rank)
+{
+    std::ofstream file(deckName+".deck");
+
+    std::string JSONData = "{ \"Deck Nace\":\"" + deckName;
+
+    for (size_t i = 0; i < 12; i++)
+    {
+        JSONData += ",\"criteria[" + std::to_string(i) + "]\": \"" + criteria[i] + "\"";
+    }
+
+    JSONData += ",\"Points\":\"" + std::to_string(points) + "\"";
+    JSONData += ",\"Rank\":\"" + rank + "\"";
+
+    JSONData += " }";
+    file << JSONData;
 }

@@ -4,62 +4,67 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
-char ValidateAnswer(std::string message);
-int AddPoints();
-std::string GetRank(int points);
-void Save(std::string deckName, int points, std::string rank);
+void NewDeck();
+char ValidateAnswer(std::string message, char answers[], std::string answerMessages[], int legnth);
+void AddPoints();
+void GetRank();
+void Save(std::string deckName);
+void Load(std::string deckName);
 
 static int ranges[6][2] = { { 0,1 }, { 2,3 }, {4, 7}, { 8, 11}, {12, 15}, {16, 19} };
 static std::string ranks[6] = { "D", "C", "B", "A", "S", "S+"};
 
-static char yes = 'Y';
-static char no = 'N';
+static char answers[] = { 'Y','N' };
+static std::string answerMessages[2] = { "Yes", "No"};
     
 static char criteria[12];
 static int points[12] = { 2,2,2,2,2,1,1,2,1,2,1,1 };
+static int pointTotal;
+static std::string rank;
 
-static std::string questionAnswerString = "\n Y) Yes \n N) No\n";
+static std::string deckQuestions[12] = 
+    { "\nDoes your commamder have card draw on it?",
+      "\nDo you have a 2 to 3 card infinte combo in the deck?",
+      "\nDoes this deck have any tutors in it?",
+      "\nDo you have a way of getting things out of the grave yard repeatedly?",
+      "\nCan you destroy lands on mass?",
+      "\nDoes your commander have a way of cheating on mana?",
+      "\nDo you have fast mana",
+      "\nDo you have free interaction",
+      "\nDo you have any stax pieces in this deck?",
+      "\nIs there an alternate win con in the deck?",
+      "\nDo you have any way of getting extra phases in this deck?",
+      "\nIs there a companion or partener of this deck?"
+    };
+
 
 int main()
 {
     bool running = true;
     std::string deckName;
-    int points;
-    std::string rank;
 
+    char options[] = { '1', '2' };
+    std::string optionMessages[] = { "New Deck", "Load Deck" };
+    char answer;
+    
     while (running)
     {
         system("CLS");
-        std::cout << "What is the name of your deck?\n";
-        std::cin >> deckName;
 
-        criteria[0] = ValidateAnswer("\nDoes your commamder have card draw on it?");
-        criteria[1] = ValidateAnswer("\nDo you have a 2 to 3 card infinte combo in the deck?");
-        criteria[2] = ValidateAnswer("\nDoes this deck have any tutors in it?");
-        criteria[3] = ValidateAnswer("\nDo you have a way of getting things out of the grave yard repeatedly?");
-        criteria[4] = ValidateAnswer("\nCan you destroy lands on mass?");
-        criteria[5] = ValidateAnswer("\nDoes your commander have a way of cheating on mana?");
-        criteria[6] = ValidateAnswer("\nDo you have fast mana");
-        criteria[7] = ValidateAnswer("\nDo you have free interaction");
-        criteria[8] = ValidateAnswer("\nDo you have any stax pieces in this deck?");
-        criteria[9] = ValidateAnswer("\nIs there an alternate win con in the deck?");
-        criteria[10] = ValidateAnswer("\nDo you have any way of getting extra phases in this deck?");
-        criteria[11] = ValidateAnswer("\nIs there a companion or partener of this deck?");
+        answer = ValidateAnswer("\nWhat would you like to do?", options, optionMessages, 2);
 
-        points = AddPoints();
-        rank = GetRank(points);
-
-        std::cout << "\n\nPoint Total: " << points << "\nRank: " << rank << '\n';
-
-        if (ValidateAnswer("\nWould you like to save this deck?\n") == yes)
+        switch (answer)
         {
-            Save(deckName, points, rank);
-        }
+            case '1':
+                NewDeck();
+                break;
+            case '2':
+                break;
+        };
 
-        char answer = ValidateAnswer("\nDo you wish to rank another deck?");
-
-        if (answer == no)
+        if (ValidateAnswer("\nDo you wish to rank another deck?", answers, answerMessages, 2) == answers[1])
         {
             running = false;
         }
@@ -69,22 +74,74 @@ int main()
     return 0;
 }
 
-char ValidateAnswer(std::string message)
+void NewDeck()
+{
+    std::string deckName;
+
+    std::cout << "What is the name of your deck?\n>";
+    std::cin >> deckName;
+
+    for (size_t i = 0; i < 12; i++)
+    {
+        criteria[i] = ValidateAnswer(deckQuestions[i], answers, answerMessages, 2);
+    }
+
+    AddPoints();
+    GetRank();
+
+    std::cout << "\n\nPoint Total: " << pointTotal << "\nRank: " << rank << '\n';
+
+    if (ValidateAnswer("\nWould you like to save this deck?\n", answers, answerMessages, 2) == answers[0])
+    {
+        Save(deckName);
+    }
+}
+
+char ValidateAnswer(std::string message, char answers[], std::string answerMessages[], int length)
 {
     char answer; 
     bool checkAgain = false;
+    int y;
+
     do
     {
-        checkAgain = false;
+        std::cout << message;
+        for (size_t i = 0; i < length; ++i)
+        {
+            std::cout << "\n" << answers[i] << ") " << answerMessages[i];
+        }
 
-        std::cout << message << questionAnswerString;
+        std::cout << "\n>";
         std::cin >> answer;
 
         answer = toupper(answer);
-        if (answer != yes && answer != no)
+
+        y = 1;
+
+        for (size_t i = 0; i < length; i++)
         {
-            std::cout << answer << " is not a validate answer. Please try again valiad answers are " << yes << " and " << no << ".....\n";
+            if (answer == answers[i])
+            {
+                y = 0;
+                break;
+            }
+        }
+
+        if (y == 1)
+        {
+            std::cout << '\n' << answer << " is not a validate answer. Please try again valiad answers are:\n";
+            
+            for (size_t i = 0; i < length; i++)
+            {
+                std::cout << answers[i] << ") " << answerMessages[i] << '\n';
+            }
+
+            std::cout << "\n";
             checkAgain = true;
+        }
+        else
+        {
+            checkAgain = false;
         }
 
     } while (checkAgain);
@@ -92,48 +149,73 @@ char ValidateAnswer(std::string message)
     return answer;
 }
 
-int AddPoints()
+void AddPoints()
 {
-    int returnValue = 0;
+    pointTotal = 0;
 
     for (size_t i = 0; i < 12; i++)
     {
-        if (criteria[i] == yes)
+        if (criteria[i] == answers[0])
         {
-            returnValue += points[i];
+            pointTotal += points[i];
         }
     }
-
-    return returnValue;
 }
 
-std::string GetRank(int points)
+void GetRank()
 {
     for (size_t i = 0; i < 6; i++)
     {
-        if (points >= ranges[i][0] && points <= ranges[i][1])
+        if (pointTotal >= ranges[i][0] && pointTotal <= ranges[i][1])
         {
-            return ranks[i];
+            rank = ranks[i];
         }
     }
-
-    return "\0";
 }
 
-void Save(std::string deckName, int points, std::string rank)
+void Save(std::string deckName)
 {
-    std::ofstream file(deckName+".deck");
+    std::ofstream file(deckName + ".deck");
 
-    std::string JSONData = "{ \"Deck Nace\":\"" + deckName;
+    std::string _string = "";
 
     for (size_t i = 0; i < 12; i++)
     {
-        JSONData += ",\"criteria[" + std::to_string(i) + "]\": \"" + criteria[i] + "\"";
+        _string += std::to_string(criteria[i]) +"\n";
     }
 
-    JSONData += ",\"Points\":\"" + std::to_string(points) + "\"";
-    JSONData += ",\"Rank\":\"" + rank + "\"";
+    _string += std::to_string(pointTotal) + "\n";
+    _string += rank;
 
-    JSONData += " }";
-    file << JSONData;
+    file << _string;
+
+    file.close();
+}
+
+void Load(std::string name)
+{
+    std::ifstream file(name + ".deck");
+    std::string temp = "";
+
+    if (file.is_open() == false)
+    {
+        // give error message
+        return;
+    }
+       
+    for (size_t i = 0; i < 12; i++)
+    {
+        std::getline(file, temp);
+        criteria[i] = temp[0];
+    }
+
+    AddPoints();
+    GetRank();
+
+    file.close();
+}
+
+void DisplayDeck(std::string deckName)
+{
+
 }
